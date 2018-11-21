@@ -9,7 +9,7 @@ public class Hundir {
 		char[][] tableroDisparosJugador = new char[11][11];
 		char[][] tableroPC = new char[11][11];
 		char[][] tableroDisparosPC = new char[11][11];
-		int[] barcos = { 4, 3, 3, 3, 2, 2, 2 }; // Número de barcos y tamaño
+		int[] barcos = { 4, 3, 2 }; // Número de barcos y tamaño
 		System.out.print("Introduce tu nombre: ");
 		nombre = entrada.next();
 
@@ -17,14 +17,14 @@ public class Hundir {
 		inicializarTablero(tableroDisparosJugador);
 		inicializarTablero(tableroPC);
 		inicializarTablero(tableroDisparosPC);
-		
+
 		tableroPC[4][4] = 'B';
 		tableroPC[4][5] = 'B';
 		tableroJugador[3][2] = 'B';
 		tableroJugador[3][3] = 'B';
 		tableroJugador[5][2] = 'B';
 		tableroJugador[5][3] = 'B';
-		colocarBarcosJugador(tableroJugador,barcos);
+		colocarBarcosJugador(tableroJugador, tableroDisparosJugador, barcos);
 		visualizarTablero(tableroPC, tableroDisparosPC);
 		System.out.println();
 		visualizarTablero(tableroJugador, tableroDisparosJugador);
@@ -34,38 +34,64 @@ public class Hundir {
 	}
 
 	// Este metodo coloca los barcos pasados como vector dentro del tablero del
-	// Jugador
-	public static void colocarBarcosJugador(char[][] tableroJugador/* ,char[][] tableroDisparos */, int[] barcos) {
+	// Jugador. REVISAR
+	public static void colocarBarcosJugador(char[][] tableroJugador, char[][] tableroDisparosJugador, int[] barcos) {
 		Scanner entrada = new Scanner(System.in);
 		int coordLetra;
 		int coordNumero;
 		String coordenada;
-		String posicion;
+		String orientacion;
+	
 
-		System.out.println("Introduce las coordenadas para colocar el barco de longitud " + barcos[0] + ". Ej. [A1]");
-		coordenada = entrada.next();
-		coordLetra = (int) (coordenada.charAt(0)) - 65+1;
-		coordNumero = coordenada.charAt(1) - 49+2;
-		System.out.println("¿Posición horizontal o vertical? [H/V]");
-		posicion = entrada.next();
+		for (int j = 0; j < barcos.length; j++) {
+			System.out.println("Introduce las coordenadas para colocar el " + (j + 1) + "º barco  (longitud "
+					+ barcos[j] + "). Ej. [A0]");
+			coordenada = entrada.next();
+			coordLetra = (int) (coordenada.charAt(0)) - 65;
+			coordNumero = coordenada.charAt(1) - 49 + 2;
+			System.out.println("¿Posición horizontal o vertical? [H/V]");
+			orientacion = entrada.next();
 
-		switch (posicion) {
-		case "H":
-			for (int i = coordNumero; i < barcos[0]; i++) {
-				tableroJugador[coordLetra][i] = 'B';
+			switch (orientacion) {
+			case "H":
+	
+					(colision == false) tableroJugador[coordLetra][i] = 'B';
+				
+				break;
+			case "V": 
+				for (int i = coordLetra; i <= barcos[j]; i++) { // menor o igual o no?
+					if (tableroJugador[i][coordNumero] == 'B') { 
+						colision = true; 
+						System.out.println("***Introduce una posición vacía");
+					
+					}
+					if (colision == false) tableroJugador[i][coordNumero] = 'B';
+				}
 			}
-			break;
-		case "V":
-			for (int i = coordLetra; i < barcos[0]; i++) {
-				tableroJugador[i][coordNumero] = 'B';
-			}
+			visualizarTablero(tableroJugador, tableroDisparosJugador);
 		}
 
 	}
 
-	private static void swicth(String posicion) {
-		// TODO Auto-generated method stub
-
+	public static boolean colision(char[][] tableroJugador, int coordLetra, int coordNumero, int longitud,
+			String orientacion) {
+		switch (orientacion) {
+		case "H":
+			for (int i = coordNumero; i <= longitud; i++) {
+				if (tableroJugador[coordLetra][i] == 'B') {
+					return true;
+				} else return false;
+			}
+			break;
+		case "V":
+			for (int i = coordLetra; i <= longitud; i++) { // menor o igual?
+				if (tableroJugador[i][coordNumero] == 'B') {
+					return true;
+				} else return false;
+			}
+			break;
+		default: return true;
+		}
 	}
 
 	// Método que implementa el disparo del jugador.
@@ -86,7 +112,7 @@ public class Hundir {
 		System.out.println("Introduce la coordenada del disparo. Ej. [A1]");
 		coordenada = entrada.next();
 		coordY = (int) (coordenada.charAt(0)) - 65;
-		coordX = coordenada.charAt(1) - 49+2;
+		coordX = coordenada.charAt(1) - 49 + 2;
 
 		if (tableroPC[coordY][coordX] != '~') {
 			tableroDisparosJugador[coordY][coordX] = 'T';
@@ -104,7 +130,8 @@ public class Hundir {
 
 	}
 
-	// Método que implementa el disparo del PC. COMPROBAR
+	// Método que implementa el disparo del PC. COMPROBAR (mirar otro metodo que
+	// almacene las coordenadas ya introducidas).
 	public static void disparoPC(char[][] tableroPC, char[][] tableroDisparosPC, char[][] tableroJugador) {
 		boolean disparo = false;
 		int coordY;
@@ -172,6 +199,7 @@ public class Hundir {
 			System.out.println();
 
 		}
+		System.out.println();
 	}
 
 	// Método que borra la terminal.
